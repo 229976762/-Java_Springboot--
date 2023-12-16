@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ghy.server.generator.mapper.EmployeeMapper">
+
+    <resultMap id="BaseResultMap" type="com.ghy.server.generator.domain.Employee">
+            <id property="employeeId" column="employee_id" jdbcType="INTEGER"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="employeeName" column="employee_name" jdbcType="VARCHAR"/>
+            <result property="contactNumber" column="contact_number" jdbcType="VARCHAR"/>
+            <result property="isManager" column="is_manager" jdbcType="TINYINT"/>
+            <result property="departmentId" column="department_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        employee_id,password,employee_name,
+        contact_number,is_manager,employee.department_id
+    </sql>
+    <update id="updateInfo">
+        update employee set employee_name = #{employeeName},
+                            contact_number = #{contactNumber}
+        where employee_id = #{employeeId}
+    </update>
+    <select id="getEmployeesList" resultType="com.ghy.form.EmployeesListQuery">
+        SELECT <include refid="Base_Column_List"></include>,department.department_name as departmentName FROM employee,department
+        <where>
+            <if test="true">
+                and employee.department_id = department.department_id
+            </if>
+            <if test="employeeId != null">
+                AND employee_id = #{employeeId}
+            </if>
+            <if test="employeeName != null and employeeName != ''">
+                AND employee_name LIKE CONCAT('%',  #{employeeName}, '%')
+            </if>
+            <if test="contactNumber != null and contactNumber != ''">
+                AND contact_number LIKE CONCAT('%', #{contactNumber}, '%')
+            </if>
+            <if test="isManager != null and isManager == 1">
+                AND is_manager = #{isManager}
+            </if>
+            <if test="departmentId != null">
+                AND employee.department_id = #{departmentId}
+            </if>
+            <if test="departmentName != null and departmentName != ''">
+                AND department.department_name = #{departmentName}
+            </if>
+        </where>
+        order by department.department_id
+    </select>
+
+</mapper>

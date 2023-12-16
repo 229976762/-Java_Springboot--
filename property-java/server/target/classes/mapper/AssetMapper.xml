@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ghy.server.generator.mapper.AssetMapper">
+
+    <resultMap id="BaseResultMap" type="com.ghy.server.generator.domain.Asset">
+            <id property="assetId" column="asset_id" jdbcType="INTEGER"/>
+            <result property="assetName" column="asset_name" jdbcType="VARCHAR"/>
+            <result property="assetSpecification" column="asset_specification" jdbcType="VARCHAR"/>
+            <result property="price" column="price" jdbcType="DECIMAL"/>
+            <result property="purchaseDate" column="purchase_date" jdbcType="DATE"/>
+            <result property="location" column="location" jdbcType="VARCHAR"/>
+            <result property="categoryId" column="category_id" jdbcType="INTEGER"/>
+            <result property="assetImage" column="asset_image" jdbcType="VARCHAR"/>
+            <result property="guardianId" column="guardian_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="base">
+        asset_id,asset_name,asset_specification,
+        price,purchase_date,location,
+        asset.category_id,asset_image,guardian_id
+    </sql>
+    <update id="recoverGuardianId">
+        update asset
+        set guardian_id = #{id}
+        where asset_id in
+        <foreach collection="assetsId" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <delete id="deleteCategory">
+        update asset
+        set category_id = null
+        where category_id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+<!--    <select id="getAssetList" resultType="com.ghy.form.ListQuery">-->
+<!--            select <include refid="base"></include>,employee_name as guardianName,category_name as categoryName-->
+<!--            FROM asset,asset_category,employee-->
+<!--            <where>-->
+<!--                <if test="true">-->
+<!--                    AND asset.category_id = asset_category.category_id AND guardian_id = employee.employee_id-->
+<!--                </if>-->
+<!--                <if test="listQuery.assetId != null"> AND asset.asset_id = #{listQuery.assetId}</if>-->
+<!--                <if test="listQuery.assetName != null and listQuery.assetName != ''"> AND asset.asset_name LIKE CONCAT('%', #{listQuery.assetName}, '%')</if>-->
+<!--                <if test="listQuery.assetSpecification != null and listQuery.assetSpecification != ''"> AND asset.asset_specification LIKE CONCAT('%', #{listQuery.assetSpecification}, '%')</if>-->
+<!--                <if test="listQuery.price != null"> AND asset.price = #{listQuery.price}</if>-->
+<!--                <if test="listQuery.purchaseDate != null"> AND asset.purchase_date = #{listQuery.purchaseDate}</if>-->
+<!--                <if test="listQuery.location != null and listQuery.location != ''"> AND asset.location LIKE CONCAT('%', #{listQuery.location}, '%')</if>-->
+<!--                <if test="listQuery.categoryName != null and listQuery.categoryName != ''"> AND category_name LIKE CONCAT('%', #{listQuery.categoryName}, '%')</if>-->
+<!--                <if test="listQuery.guardianName != null and listQuery.guardianName != ''"> AND employee_name LIKE CONCAT('%', #{listQuery.guardianName}, '%')</if>-->
+<!--            </where>-->
+
+
+<!--            order by  asset_id-->
+<!--    </select>-->
+
+    <select id="getAssetList" resultType="com.ghy.form.ListQuery">
+        select <include refid="base"></include>,employee_name as guardianName,category_name as categoryName
+        FROM asset
+        LEFT JOIN asset_category ON asset.category_id = asset_category.category_id
+        LEFT JOIN employee ON asset.guardian_id = employee.employee_id
+        <where>
+
+            <if test="listQuery.assetId != null"> AND asset.asset_id = #{listQuery.assetId}</if>
+            <if test="listQuery.assetName != null and listQuery.assetName != ''"> AND asset.asset_name LIKE CONCAT('%', #{listQuery.assetName}, '%')</if>
+            <if test="listQuery.assetSpecification != null and listQuery.assetSpecification != ''"> AND asset.asset_specification LIKE CONCAT('%', #{listQuery.assetSpecification}, '%')</if>
+            <if test="listQuery.price != null"> AND asset.price = #{listQuery.price}</if>
+            <if test="listQuery.purchaseDate != null"> AND asset.purchase_date = #{listQuery.purchaseDate}</if>
+            <if test="listQuery.location != null and listQuery.location != ''"> AND asset.location LIKE CONCAT('%', #{listQuery.location}, '%')</if>
+            <if test="listQuery.categoryName != null and listQuery.categoryName != ''"> AND category_name LIKE CONCAT('%', #{listQuery.categoryName}, '%')</if>
+            <if test="listQuery.guardianName != null and listQuery.guardianName != ''"> AND employee_name LIKE CONCAT('%', #{listQuery.guardianName}, '%')</if>
+        </where>
+        order by asset_id
+    </select>
+    <select id="selectPhoto" resultType="com.ghy.server.generator.domain.Asset">
+        select asset_image from asset where asset_id = #{assetId}
+    </select>
+
+
+</mapper>

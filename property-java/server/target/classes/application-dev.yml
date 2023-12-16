@@ -1,0 +1,31 @@
+server:
+  port: 8081
+
+# DataSource Config
+spring:
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql:///asset?userUnicode=true&characterEncoding=utf-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jackson:
+    date-format: yyyy-MM-dd
+    time-zone: GMT+8
+
+
+
+#配置mybatis
+mybatis-plus:
+  #别名包,实体类的路径
+  type-aliases-package: com.ghy.server.generator.domain
+  #将所有的映射文件全部加载
+  mapper-locations: classpath:/mapper/*.xml
+  #开启驼峰映射
+  configuration:
+#    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      update-strategy: ignored
+
